@@ -1,34 +1,27 @@
-/**
- * Some predefined delay values (in milliseconds).
- */
-export enum Delays {
-  Short = 500,
-  Medium = 2000,
-  Long = 5000,
-}
+import axios from "axios";
+import jsdom from "jsdom";
+const { JSDOM } = jsdom;
 
-/**
- * Returns a Promise<string> that resolves after a given time.
- *
- * @param {string} name - A name.
- * @param {number=} [delay=Delays.Medium] - A number of milliseconds to delay resolution of the Promise.
- * @returns {Promise<string>}
- */
-function delayedHello(
-  name: string,
-  delay: number = Delays.Medium,
-): Promise<string> {
-  return new Promise((resolve: (value?: string) => void) =>
-    setTimeout(() => resolve(`Hello, ${name}`), delay),
-  );
-}
+const url = 'https://krisha.kz/prodazha/kvartiry/almaty/?das[_sys.hasphoto]=1&das[floor_not_first]=1&das[floor_not_last]=1&das[house.year][from]=2010&das[house.year][to]=2021&das[live.rooms]=2&das[live.square][from]=45&das[map.complex]=876&das[price][to]=45000000';
 
-// Please see the comment in the .eslintrc.json file about the suppressed rule!
-// Below is an example of how to use ESLint errors suppression. You can read more
-// at https://eslint.org/docs/latest/user-guide/configuring/rules#disabling-rules
+(async () => {
+  let html: string;
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export async function greeter(name: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
-  // The name parameter should be of type string. Any is used only to trigger the rule.
-  return await delayedHello(name, Delays.Long);
-}
+  try {
+    const resp = await axios.get(url);
+    html = resp.data;
+
+
+  } catch(err) {
+    if(axios.isAxiosError(err)) {
+      console.log(err);
+    } else {
+      console.log(err);
+    }
+  }
+
+  const dom = new JSDOM(html);
+  const document = dom.window.document;
+  const items = document.querySelectorAll('.a-card__main-info ');
+  console.log(items.length);
+})()
