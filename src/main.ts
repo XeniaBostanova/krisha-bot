@@ -12,16 +12,16 @@ const url = 'https://krisha.kz/prodazha/kvartiry/almaty/?das[_sys.hasphoto]=1&da
     html = resp.data;
 
 
-  } catch(err) {
-    if(axios.isAxiosError(err)) {
-      console.log(err);
+  } catch(error) {
+    if(axios.isAxiosError(error)) {
+      console.log(error);
     } else {
-      console.log(err);
+      console.log(error);
     }
   }
 
   const dom = new JSDOM(html);
   const document = dom.window.document;
-  const items = document.querySelectorAll('.a-card__main-info ');
+  const items = document.querySelectorAll('.a-card__main-info');
   console.log(items.length);
 })()
