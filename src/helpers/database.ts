@@ -42,10 +42,11 @@ class DatabaseServise {
         });
     })
   }
+
   //добавить новое объявление
   setNewAd(ad: Ad): Promise <any> {
     return new Promise((resolve, reject) => {
-      set(ref(this.db, 'ads' + '/' + ad.id), ad)
+      set(ref(this.db, 'ads' + '/' + ad.title), ad)
         .then(()=> resolve(''))
         .catch(error => reject(error));
     })
@@ -61,7 +62,8 @@ export interface Collection <T> {
 
 export interface Ad {
   title: string,
-  id: string,
-  price: number,
+  owner: string,
+  // id: string,
+  price: string,
   url: string
 }
