@@ -1,6 +1,6 @@
 import { Ad, Collection } from "./database.js";
 
-export function pause(val:500) {
+export function pause(val: 500) {
   return new Promise(resolve => {
     setTimeout(resolve, val);
   })

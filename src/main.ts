@@ -44,15 +44,20 @@ const url = 'https://krisha.kz/prodazha/kvartiry/almaty/?das[_sys.hasphoto]=1&da
     }
   })
 
-  console.log(newAds);
-
   //получить коллекцию сохраненных объявлений с firebase
 
   const savedAds = await db.getSavedAds();
 
   //сравнить 2 коллекции
 
-  const newTitleAd = compareCollections(savedAds, newAds);
-  console.log(newTitleAd);
+  const newIds = compareCollections(savedAds, newAds);
+  console.log(newIds);
+
+  for (const id of newIds) {
+    await db.setNewAd(newAds[id]);
+    await pause(500);
+  }
+
+  process.exit(1);
 
 })()
