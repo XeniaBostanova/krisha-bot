@@ -1,6 +1,6 @@
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { child, Database, get, getDatabase, ref, set } from "firebase/database";
+import { child, Database, get, getDatabase, onChildAdded, onChildChanged, onChildMoved, onChildRemoved, ref, set } from "firebase/database";
 import { conf } from "../../config.js";
 
 
@@ -51,6 +51,34 @@ class DatabaseServise {
         .catch(error => reject(error));
     })
   }
+
+  //получить все задачи
+  getTasks(): Promise <Collection<Task>> {
+    return new Promise((resolve, reject) => {
+      get(child(ref(this.db), 'tasks'))
+        .then(snapshot => resolve(snapshot.val()))
+        .catch(error => reject(error))
+    })
+  }
+
+  //подписка на изменение задачи в firebase
+  subscribeToTaskChange() {
+    let activatePause = true;
+
+    return new Promise(resolve => {
+      onChildChanged(ref(this.db, 'tasks'), (sn) => resolve(sn.val()));
+      onChildMoved(ref(this.db, 'tasks'), (sn) => resolve(sn.val()));
+      onChildRemoved(ref(this.db, 'tasks'), (sn) => resolve(sn.val()));
+      onChildAdded(ref(this.db, 'tasks'), (sn) => {
+        setTimeout(() => {
+          activatePause = false;
+        })
+        if(!activatePause) {
+          resolve(sn.val())
+        }
+      });
+    })
+  }
 }
 
 const db = new DatabaseServise();
@@ -66,4 +94,10 @@ export interface Ad {
   id: string,
   price: string,
   url: string
+}
+
+export interface Task {
+  id: string,
+  cron: string,
+  query: string
 }

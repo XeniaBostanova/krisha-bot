@@ -10,8 +10,3 @@ export function compareCollections(src: Collection<Ad>, updates: Collection<Ad>)
   const srcKeys = Object.keys(src);
   return Object.keys(updates).filter(key => !srcKeys.includes(key));
 }
-
-
-// export function compareCollections(src: Collection<Ad>, updates: Collection<Ad>): string[] {
-//   return Object.keys[updates].filter(key => !src[key]);
-// }
