@@ -1,63 +1,65 @@
-import axios from "axios";
-import jsdom from "jsdom";
-import db, { Ad, Collection } from "./helpers/database.js";
-import { compareCollections, pause } from "./helpers/utils.js";
-const { JSDOM } = jsdom;
+import db, { Task } from "./helpers/database.js";
+import { pause } from "./helpers/utils.js";
+import { CronJob, CronTime } from 'cron';
+import { Krisha } from "./helpers/krisha.js";
 
-const url = 'https://krisha.kz/prodazha/kvartiry/almaty/?das[_sys.hasphoto]=1&das[floor_not_first]=1&das[floor_not_last]=1&das[house.year][from]=2010&das[house.year][to]=2021&das[live.rooms]=2&das[live.square][from]=47&das[map.complex]=997&das[price][to]=45000000';
+function isValidCronExpression(expression) {
+  try {
+    new CronTime(expression);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
-(async () => {
-
-  //необходимо, чтобы firebase успела инициализироваться
-  await pause(500);
-
-  // let html: string;
-
-  // try {
-  //   const resp = await axios.get(url);
-  //   html = resp.data;
-
-
-  // } catch(error) {
-  //   if(axios.isAxiosError(error)) {
-  //     console.log(error);
-  //   } else {
-  //     console.log(error);
-  //   }
-  // }
-
-  // const dom = new JSDOM(html);
-  // const document = dom.window.document;
-  // const items = document.querySelectorAll('.a-card__inc');
-
-  //создать коллекцию новых объявлений
-  // const newAds: Collection<Ad> = {};
-
-  // items.forEach((node) => {
-  //   const adId = node.querySelector('.a-card__image  ').getAttribute('href').replace(/\D+/g, "");
-  //   newAds[adId] = {
-  //     title: node.querySelector('.a-card__title ').textContent,
-  //     owner: node.querySelector('.owners__label').textContent.trim(),
-  //     id: adId,
-  //     price: node.querySelector('.a-card__price').textContent.replace(/\r?\n/g, "").trim(),
-  //     url: node.querySelector('.a-card__image  ').getAttribute('href'),
-  //   }
-  // })
-
-  //получить коллекцию сохраненных объявлений с firebase
-
-  // const savedAds = await db.getSavedAds();
-
-  //сравнить 2 коллекции
-
-  const newIds = compareCollections(savedAds, newAds);
-  console.log(newIds);
-
-  for (const id of newIds) {
-    await db.setNewAd(newAds[id]);
-    await pause(500);
+function createJob(task: Task): CronJob {
+  console.log(`Создается задача ${task.id}`);
+  if (!isValidCronExpression(task.cron)) {
+    console.error(`Invalid cron expression: ${task.cron}`);
   }
 
-  process.exit(1);
+  return new CronJob(task.cron, async () => {
+    const krisha = new Krisha(task);
+    console.log(`Запускается задача ${task.id}`);
 
-})()
+    try {
+      const newIds = await krisha.getAdsIds();
+
+      for (const id of newIds) {
+        await db.setNewAd(task.id, krisha.updateAds[id]);
+        await pause(300);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  });
+}
+
+async function run() {
+  const jobs = []; //для хранения cronJobs
+  await pause(5000);
+  let fullTasks = []; //для хранения задач, полученных из firebase
+
+  try {
+    fullTasks = Object.values(await db.getTasks());
+    console.log('Получен список задач');
+  } catch(err) {
+    console.error(err);
+  }
+
+  for (const task of fullTasks) {
+    const job = createJob(task);
+    job.start();
+    jobs.push(job);
+  }
+
+  //подписываемся на обновление задач
+  db.subscribeToTaskChange()
+    .then(() => {
+      jobs.forEach((j: CronJob) => j.stop());
+      run();
+    })
+
+}
+
+run();

@@ -1,5 +1,7 @@
 import axios from "axios";
+import jsdom from "jsdom";
 import db, { Ad, Collection, Task } from "./database.js";
+import { compareCollections } from "./utils.js";
 const { JSDOM } = jsdom;
 
 export class Krisha {
@@ -23,6 +25,10 @@ export class Krisha {
       const html = await this.fetchAds(this.baseUrl, complex);
       this._updateAds = {...this._updateAds, ...this.getAdsFromDom(html)}
     }
+
+    const newIds = compareCollections(savedAds, this._updateAds);
+    console.log(`Обнаружено ${newIds.length} новых объявлений`);
+    return newIds;
   }
 
   //метод запроса объявлений
@@ -30,7 +36,7 @@ export class Krisha {
     let html: string;
 
     try {
-      const resp = await axios.get(`${baseUrl}/?das[_sys.hasphoto]=1&das[floor_not_first]=1&das[floor_not_last]=1&das[house.year][from]=2010&das[house.year][to]=2021&das[live.rooms]=2&das[live.square][from]=47&das[map.complex]=${complex}&das[price][to]=45000000`);
+      const resp = await axios.get(`${baseUrl}/?das[_sys.hasphoto]=1&das[floor_not_first]=1&das[floor_not_last]=1&das[house.year][from]=2010&das[house.year][to]=2021&das[live.rooms]=2&das[live.square][from]=45&das[map.complex]=${complex}&das[price][to]=52000000`);
       html = resp.data;
 
     } catch(error) {
