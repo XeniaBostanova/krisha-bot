@@ -11,42 +11,42 @@ const url = 'https://krisha.kz/prodazha/kvartiry/almaty/?das[_sys.hasphoto]=1&da
   //необходимо, чтобы firebase успела инициализироваться
   await pause(500);
 
-  let html: string;
+  // let html: string;
 
-  try {
-    const resp = await axios.get(url);
-    html = resp.data;
+  // try {
+  //   const resp = await axios.get(url);
+  //   html = resp.data;
 
 
-  } catch(error) {
-    if(axios.isAxiosError(error)) {
-      console.log(error);
-    } else {
-      console.log(error);
-    }
-  }
+  // } catch(error) {
+  //   if(axios.isAxiosError(error)) {
+  //     console.log(error);
+  //   } else {
+  //     console.log(error);
+  //   }
+  // }
 
-  const dom = new JSDOM(html);
-  const document = dom.window.document;
-  const items = document.querySelectorAll('.a-card__inc');
+  // const dom = new JSDOM(html);
+  // const document = dom.window.document;
+  // const items = document.querySelectorAll('.a-card__inc');
 
   //создать коллекцию новых объявлений
-  const newAds: Collection<Ad> = {};
+  // const newAds: Collection<Ad> = {};
 
-  items.forEach((node) => {
-    const adId = node.querySelector('.a-card__image  ').getAttribute('href').replace(/\D+/g, "");
-    newAds[adId] = {
-      title: node.querySelector('.a-card__title ').textContent,
-      owner: node.querySelector('.owners__label').textContent.trim(),
-      id: adId,
-      price: node.querySelector('.a-card__price').textContent.replace(/\r?\n/g, "").trim(),
-      url: node.querySelector('.a-card__image  ').getAttribute('href'),
-    }
-  })
+  // items.forEach((node) => {
+  //   const adId = node.querySelector('.a-card__image  ').getAttribute('href').replace(/\D+/g, "");
+  //   newAds[adId] = {
+  //     title: node.querySelector('.a-card__title ').textContent,
+  //     owner: node.querySelector('.owners__label').textContent.trim(),
+  //     id: adId,
+  //     price: node.querySelector('.a-card__price').textContent.replace(/\r?\n/g, "").trim(),
+  //     url: node.querySelector('.a-card__image  ').getAttribute('href'),
+  //   }
+  // })
 
   //получить коллекцию сохраненных объявлений с firebase
 
-  const savedAds = await db.getSavedAds();
+  // const savedAds = await db.getSavedAds();
 
   //сравнить 2 коллекции
 

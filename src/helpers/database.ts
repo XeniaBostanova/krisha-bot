@@ -27,9 +27,9 @@ class DatabaseServise {
   }
 
   //получить все сохраненные объявления
-  getSavedAds(): Promise <Collection<Ad>> {
+  getSavedAds(taskId: string): Promise <Collection<Ad>> {
     return new Promise((resolve, reject) => {
-      get(child(ref(this.db), 'ads'))
+      get(child(ref(this.db), 'ads/' + taskId))
         .then((snapshot) => {
           if (snapshot.exists) {
             resolve(snapshot.val() || {});
@@ -90,6 +90,7 @@ export interface Collection <T> {
 
 export interface Ad {
   title: string,
+  address: string,
   owner: string,
   id: string,
   price: string,
@@ -99,5 +100,6 @@ export interface Ad {
 export interface Task {
   id: string,
   cron: string,
-  query: string
+  query: string,
+  complex: string
 }
