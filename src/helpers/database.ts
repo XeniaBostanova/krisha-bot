@@ -46,7 +46,7 @@ class DatabaseServise {
   //добавить новое объявление
   setNewAd(path: string, ad: Ad): Promise <any> {
     return new Promise((resolve, reject) => {
-      set(ref(this.db, path + '/' + ad.id), ad)
+      set(ref(this.db, 'ads/' + path + '/' + ad.id), ad)
         .then(()=> resolve(''))
         .catch(error => reject(error));
     })
