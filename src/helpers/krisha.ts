@@ -36,7 +36,7 @@ export class Krisha {
     let html: string;
 
     try {
-      const resp = await axios.get(`${baseUrl}/?das[_sys.hasphoto]=1&das[floor_not_first]=1&das[floor_not_last]=1&das[house.year][from]=2010&das[house.year][to]=2021&das[live.rooms]=2&das[live.square][from]=45&das[map.complex]=${complex}&das[price][to]=52000000`);
+      const resp = await axios.get(`${baseUrl}/?das[_sys.hasphoto]=1&das[floor_not_first]=1&das[floor_not_last]=1&das[house.year][from]=2010&das[house.year][to]=2021&das[live.rooms][]=1&das[live.rooms][]=2&das[live.square][from]=45&das[map.complex]=${complex}&das[price][to]=45000000`);
       html = resp.data;
 
     } catch(error) {
@@ -63,7 +63,7 @@ export class Krisha {
       const adId = node.querySelector('.a-card__image  ').getAttribute('href').replace(/\D+/g, "");
       newAds[adId] = {
         title: node.querySelector('.a-card__title ').textContent,
-        address: node.querySelector('.a-card__subtitle ').textContent,
+        address: node.querySelector('.a-card__subtitle ').textContent.trim(),
         owner: node.querySelector('.owners__label').textContent.trim(),
         id: adId,
         price: node.querySelector('.a-card__price').textContent.replace(/\r?\n/g, "").trim(),
